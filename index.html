@@ -446,6 +446,25 @@ function finish(){
  setTimeout(function(){clearInterval(iv);result()},2800);
 }
 
+/* Envio das respostas para o n8n. Formato x-www-form-urlencoded (campos planos) para não
+   depender de CORS: o navegador envia sem preflight e o n8n recebe cada campo em body. */
+var WEBHOOK="https://automacao-n8n-n8n.6v8bw5.easypanel.host/webhook/black26-quiz";
+var TRACK=["email","telefone","utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
+function sendResult(p){
+ try{
+  var f=new URLSearchParams();
+  f.append("nome",p.nome);f.append("perfil",p.perfil);f.append("indice_geral",p.indice_geral);f.append("area_maior_espera",p.area_maior_espera);
+  Object.keys(p.indices).forEach(function(k){f.append("indice_"+k,p.indices[k])});
+  Object.keys(p.respostas).forEach(function(k){f.append("resp_"+k,p.respostas[k]==null?"":p.respostas[k])});
+  Object.keys(p.textos).forEach(function(k){f.append(k,p.textos[k])});
+  var qs=new URLSearchParams(location.search);
+  TRACK.forEach(function(k){f.append(k,qs.get(k)||"")});
+  f.append("enviado_em",new Date().toISOString());
+  f.append("pagina",location.href.split("#")[0]);
+  fetch(WEBHOOK,{method:"POST",mode:"no-cors",keepalive:true,body:f}).catch(function(){});
+ }catch(e){}
+}
+
 function result(){
  var sums={},max={};
  Q.forEach(function(q){if(!q.dim)return;var o=q.o[state.a[q.id]];sums[q.dim]=(sums[q.dim]||0)+o.p;max[q.dim]=(max[q.dim]||0)+3});
@@ -496,6 +515,7 @@ function result(){
  seq().forEach(function(q){if(q.type!=="text")payload.respostas[q.id]=ans(q.id)});
  payload.textos={sonho_outro:state.txt.sonho||"",cursos_quais:state.txt.cursos_quais||"",pergunta_ao_vivo:state.txt.pergunta||""};
  window.__primeiroVoceResultado=payload;
+ sendResult(payload);
  try{console.log("PRIMEIRO VOCÊ | resultado",payload)}catch(e){}
 
  show("s-res");
