@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Teste do webhook | Primeiro Você</title>
+<style>
+  :root{--bg:#000;--panel:#15100a;--text:#F4EDDD;--muted:#B3A78C;--pink:#D9B25E;--purple:#9A7430;--gold:#F7E6B5;--line:rgba(255,255,255,.12);--ok:#51d6a0;--danger:#ff7e9e}
+  *{box-sizing:border-box}
+  body{margin:0;padding:40px 16px 72px;background:radial-gradient(120% 80% at 50% 0%,#15100a 0%,#000 60%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
+  .wrap{width:min(860px,100%);margin:0 auto}
+  h1{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.1;letter-spacing:-.035em;margin:0 0 10px}
+  .eyebrow{color:#D9B25E;font-size:.78rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;margin:0 0 12px}
+  .intro{color:var(--muted);margin:0 0 28px}
+  .card{background:linear-gradient(145deg,rgba(28,20,40,.97),rgba(17,12,25,.98));border:1px solid var(--line);border-radius:20px;padding:clamp(20px,4vw,32px);margin-bottom:20px}
+  .card h2{font-size:1.15rem;margin:0 0 6px;letter-spacing:-.02em}
+  .card p{color:var(--muted);font-size:.92rem;margin:0 0 16px}
+  label{display:block;font-weight:800;font-size:.86rem;margin:0 0 7px}
+  input[type=text]{width:100%;min-height:50px;border:1px solid var(--line);background:#0d0913;color:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:.9rem;outline:none}
+  input[type=text]:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(125,75,240,.14)}
+  .row{display:flex;flex-wrap:wrap;gap:11px;margin-top:16px}
+  button{border:0;border-radius:12px;min-height:50px;padding:0 20px;color:#140e05;background:linear-gradient(115deg,#F7E6B5 0%,#D9B25E 45%,#9A7430 70%,#D9B25E 100%);font:inherit;font-weight:900;cursor:pointer;transition:transform .18s,filter .18s}
+  button:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.08)}
+  button:disabled{opacity:.5;cursor:progress}
+  button.secondary{background:transparent;border:1px solid var(--line);color:var(--text)}
+  .origin{font-size:.82rem;color:#8f8499;margin-top:14px}
+  .origin code{color:var(--gold)}
+  .verdict{display:none;margin-top:22px;padding:18px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+  .verdict.show{display:block}
+  .verdict h3{margin:0 0 8px;font-size:1.02rem}
+  .verdict.ok{border-color:rgba(81,214,160,.5)}
+  .verdict.ok h3{color:var(--ok)}
+  .verdict.bad{border-color:rgba(255,126,158,.5)}
+  .verdict.bad h3{color:var(--danger)}
+  .verdict p{color:#ded5e6;font-size:.9rem;margin:0 0 10px}
+  .verdict ol,.verdict ul{color:#ded5e6;font-size:.9rem;margin:0 0 10px;padding-left:20px}
+  .verdict li{margin-bottom:5px}
+  .steps{display:grid;gap:9px;margin:0 0 18px;padding:0;list-style:none}
+  .steps li{display:flex;gap:11px;align-items:flex-start;font-size:.88rem;color:#ded5e6;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.03)}
+  .steps .dot{flex:0 0 22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:.72rem;font-weight:900;background:rgba(255,255,255,.09);color:var(--gold)}
+  .steps li.run .dot{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}
+  .steps li.ok .dot{background:rgba(81,214,160,.22);color:var(--ok)}
+  .steps li.bad .dot{background:rgba(255,126,158,.22);color:var(--danger)}
+  pre{background:#0b0810;border:1px solid var(--line);border-radius:12px;padding:15px;overflow-x:auto;font-size:.79rem;line-height:1.5;color:#cfc4da;margin:0}
+  details{margin-top:16px}
+  summary{cursor:pointer;font-weight:800;font-size:.86rem;color:var(--gold);margin-bottom:11px}
+  .warn{border-left:3px solid var(--gold);padding:12px 15px;background:rgba(217,180,95,.07);border-radius:0 11px 11px 0;font-size:.87rem;color:#e6dcef;margin:0 0 18px}
+  footer{color:#7d7288;font-size:.78rem;margin-top:32px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Homologação técnica</p>
+  <h1>Teste do webhook</h1>
+  <p class="intro">Esta página envia para o n8n exatamente a mesma requisição que o quiz envia ao ser concluído, e diz onde está o problema quando a entrega falha.</p>
+
+  <div class="card">
+    <p class="warn"><strong>Abra esta página no mesmo domínio em que o quiz ficará publicado.</strong> O navegador libera ou bloqueia a requisição com base na origem de quem envia. Testar a partir de um arquivo local ou de outro endereço não prova nada sobre o ambiente real.</p>
+
+    <label for="url">Endpoint do webhook</label>
+    <input type="text" id="url" spellcheck="false" value="" placeholder="https://.../webhook/primeiro-voce">
+
+    <div class="row">
+      <button id="run">Enviar requisição de teste</button>
+      <button id="copy" class="secondary" type="button">Copiar o payload</button>
+    </div>
+
+    <p class="origin">Origem desta página: <code id="origin"></code></p>
+
+    <ul class="steps" id="steps" hidden>
+      <li id="s1"><span class="dot">1</span><span>Enviando <code>POST</code> com <code>Content-Type: application/json</code></span></li>
+      <li id="s2"><span class="dot">2</span><span>Verificando se o servidor está acessível</span></li>
+    </ul>
+
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <div class="card">
+    <h2>Payload enviado no teste</h2>
+    <p>Mesma estrutura da submissão real, com <code>modo: "teste"</code> para você conseguir filtrar e descartar esse registro no n8n.</p>
+    <details open>
+      <summary>Ver o JSON</summary>
+      <pre id="payloadView"></pre>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Resposta recebida</h2>
+    <p>O que o n8n devolveu na última tentativa.</p>
+    <pre id="responseView">Nenhum teste executado ainda.</pre>
+  </div>
+
+  <footer>Página de apoio à homologação. Pode ser removida depois que o quiz entrar no ar.</footer>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+
+const payload = {
+  quiz: "primeiro_voce_2026",
+  version: "1.0",
+  modo: "teste",
+  submissionId: "teste-" + Date.now(),
+  nome: "Registro de Teste",
+  perfil: "Sempre para depois",
+  indice_geral: 58,
+  indices: { dinheiro: 67, tempo: 50, sonhos: 33, permissao: 83 },
+  area_maior_espera: "permissao",
+  respostas: { pessoa: "filhos", compra: "ano", extra: "reserva", investimento: "zero", area: "relacionamentos", quando: "calma", adiando: "menos1", sonho: "dividas", sentimento: "medo", obstaculo: "dinheiro", relacao: "redes", momento: "curioso" },
+  respostas_texto: { pessoa: "Meus filhos", compra: "Em algum momento deste ano", extra: "Guardo para uma emergência", investimento: "Nada", area: "Os relacionamentos", quando: "…a vida der uma acalmada", adiando: "Menos de um ano", sonho: "Sair das dívidas", sentimento: "Medo de que falte depois", obstaculo: "Falta de dinheiro", relacao: "Acompanho nas redes", momento: "Curiosidade, quero entender" },
+  completedAt: new Date().toISOString(),
+  params: { utm_source: "teste", utm_medium: "homologacao", utm_campaign: "primeiro_voce" }
+};
+
+$("origin").textContent = location.origin === "null" ? "arquivo local (file://)" : location.origin;
+$("payloadView").textContent = JSON.stringify(payload, null, 2);
+
+$("copy").addEventListener("click", async () => {
+  try{ await navigator.clipboard.writeText(JSON.stringify(payload, null, 2)); $("copy").textContent = "Copiado"; }
+  catch(_){ $("copy").textContent = "Não foi possível copiar"; }
+  setTimeout(() => { $("copy").textContent = "Copiar o payload"; }, 2000);
+});
+
+function mark(id, state){ const el = $(id); el.classList.remove("run","ok","bad"); el.classList.add(state); }
+
+function verdict(kind, title, bodyHtml){
+  const box = $("verdict");
+  box.className = "verdict show " + kind;
+  box.innerHTML = "<h3>" + title + "</h3>" + bodyHtml;
+}
+
+async function run(){
+  const url = $("url").value.trim();
+  if(!url){ verdict("bad", "Informe o endereço do webhook", "<p>O campo do endpoint está vazio.</p>"); return; }
+
+  $("run").disabled = true;
+  $("steps").hidden = false;
+  $("verdict").className = "verdict";
+  $("responseView").textContent = "Aguardando resposta...";
+  mark("s1","run"); $("s2").classList.remove("run","ok","bad");
+
+  payload.submissionId = "teste-" + Date.now();
+  payload.completedAt = new Date().toISOString();
+  $("payloadView").textContent = JSON.stringify(payload, null, 2);
+
+  let response = null, networkError = null;
+  try{
+    response = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+  }catch(error){ networkError = error; }
+
+  if(response){
+    const text = await response.text().catch(() => "");
+    $("responseView").textContent = "HTTP " + response.status + " " + response.statusText + "\n\n" + (text || "(corpo vazio)");
+
+    if(response.ok){
+      mark("s1","ok"); mark("s2","ok");
+      verdict("ok", "Entrega confirmada",
+        "<p>O n8n recebeu a requisição e respondeu <strong>HTTP " + response.status + "</strong>. O quiz vai registrar as respostas normalmente a partir deste domínio.</p>" +
+        "<p>Confira agora, nas execuções do workflow, se o registro chegou com todos os campos.</p>");
+    }else if(response.status === 404){
+      mark("s1","bad"); mark("s2","ok");
+      verdict("bad", "Servidor acessível, mas o webhook respondeu 404",
+        "<p>A rede está liberada e o CORS está correto. O que falta é o workflow.</p><ol>" +
+        "<li>Abra o workflow no n8n e ative-o no botão <strong>Active</strong>.</li>" +
+        "<li>Confirme que o caminho do nó Webhook é exatamente o mesmo do endereço acima e que o método é <code>POST</code>.</li>" +
+        "<li>Use sempre a URL de produção, com <code>/webhook/</code>. A de teste, com <code>/webhook-test/</code>, só funciona enquanto a tela de execução está aberta.</li></ol>");
+    }else{
+      mark("s1","bad"); mark("s2","ok");
+      verdict("bad", "O webhook respondeu HTTP " + response.status,
+        "<p>A requisição chegou ao n8n, porém o workflow não concluiu com sucesso. Abra as execuções do workflow e verifique qual nó falhou.</p>" +
+        "<p>O quiz considera entrega bem-sucedida apenas respostas na faixa 2xx.</p>");
+    }
+    $("run").disabled = false;
+    return;
+  }
+
+  mark("s1","bad"); mark("s2","run");
+  $("responseView").textContent = "O navegador bloqueou a leitura da resposta.\n\n" + (networkError ? networkError.name + ": " + networkError.message : "");
+
+  let reachable = false;
+  try{ await fetch(url, { method:"GET", mode:"no-cors", cache:"no-store" }); reachable = true; }
+  catch(_){ reachable = false; }
+
+  if(reachable){
+    mark("s2","ok");
+    verdict("bad", "O servidor responde, mas o CORS está bloqueando o envio",
+      "<p>Este é o cenário mais perigoso: a pessoa termina o quiz, vê o resultado dela, e a resposta nunca chega até você. Sem erro visível na tela.</p>" +
+      "<p>Correção no n8n:</p><ol>" +
+      "<li>Abra o nó <strong>Webhook</strong> do workflow.</li>" +
+      "<li>Em <strong>Options</strong>, adicione <strong>Allowed Origins (CORS)</strong>.</li>" +
+      "<li>Informe <code>" + (location.origin === "null" ? "https://dominio-final-do-quiz" : location.origin) + "</code>. Para homologar, <code>*</code> também serve.</li>" +
+      "<li>Salve e ative o workflow novamente.</li>" +
+      "<li>Repita este teste.</li></ol>");
+  }else{
+    mark("s2","bad");
+    verdict("bad", "Não foi possível alcançar o servidor",
+      "<p>A requisição não chegou ao destino. Verifique, nesta ordem:</p><ol>" +
+      "<li>Se o endereço está correto, sem espaço ou caractere sobrando.</li>" +
+      "<li>Se a instância do n8n está no ar, abrindo o endereço direto no navegador.</li>" +
+      "<li>Se o certificado HTTPS é válido no domínio do n8n.</li>" +
+      "<li>Se a rede em que você está não bloqueia esse domínio.</li></ol>");
+  }
+  $("run").disabled = false;
+}
+
+$("run").addEventListener("click", run);
+</script>
+</body>
+</html>

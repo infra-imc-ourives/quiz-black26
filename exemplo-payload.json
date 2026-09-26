@@ -1,0 +1,50 @@
+{
+  "quiz": "primeiro_voce_2026",
+  "version": "1.0",
+  "submissionId": "ccc65edd-2cc8-463f-a1d9-32d6d8ed6a4f",
+  "nome": "Jaque",
+  "perfil": "Sempre para depois",
+  "indice_geral": 58,
+  "indices": {
+    "dinheiro": 67,
+    "tempo": 50,
+    "sonhos": 33,
+    "permissao": 83
+  },
+  "area_maior_espera": "permissao",
+  "respostas": {
+    "pessoa": "filhos",
+    "compra": "ano",
+    "extra": "reserva",
+    "investimento": "zero",
+    "area": "relacionamentos",
+    "quando": "calma",
+    "adiando": "menos1",
+    "sonho": "dividas",
+    "sentimento": "medo",
+    "obstaculo": "dinheiro",
+    "relacao": "redes",
+    "momento": "curioso"
+  },
+  "respostas_texto": {
+    "pessoa": "Meus filhos",
+    "compra": "Em algum momento deste ano",
+    "extra": "Guardo para uma emergência",
+    "investimento": "Nada",
+    "area": "Os relacionamentos",
+    "quando": "…a vida der uma acalmada",
+    "adiando": "Menos de um ano",
+    "sonho": "Sair das dívidas",
+    "sentimento": "Medo de que falte depois",
+    "obstaculo": "Falta de dinheiro",
+    "relacao": "Acompanho nas redes",
+    "momento": "Curiosidade, quero entender"
+  },
+  "completedAt": "2026-09-26T17:32:28.747Z",
+  "params": {
+    "utm_source": "instagram",
+    "utm_medium": "stories",
+    "utm_campaign": "primeiro_voce",
+    "email": "pessoa@exemplo.com"
+  }
+}

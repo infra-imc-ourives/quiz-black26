@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Primeiro Você · Em que lugar da sua própria lista você está?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --black:#000;
+  --ink:#F4EDDD;
+  --muted:#B3A78C;
+  --line:#3A3122;
+  --g1:#F7E6B5; --g2:#D9B25E; --g3:#9A7430;
+  --gold:linear-gradient(115deg,var(--g1) 0%,var(--g2) 45%,var(--g3) 70%,var(--g2) 100%);
+  --serif:"Bodoni Moda","Didot","Bodoni 72","Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--black:#000}}
+:root[data-theme="dark"]{--black:#000}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(120% 80% at 50% 0%,#15100a 0%,#000 60%) fixed,var(--black);color:var(--ink);font-family:var(--serif);font-size:18px;font-weight:500;line-height:1.65;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+.wrap{max-width:640px;margin:0 auto;padding:28px 22px 64px}
+.goldtext{background:var(--gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.screen{display:none}
+.screen.on{display:block;animation:in .5s ease both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.on{animation:none}*{transition:none!important}}
+
+/* intro */
+.logo{width:min(250px,62%);margin:8px auto 38px}
+.intro h1{font-weight:400;font-size:clamp(34px,8vw,52px);line-height:1.08;letter-spacing:-.01em;margin:0 0 22px;text-align:center}
+.intro p{color:var(--muted);text-align:center;margin:0 auto 34px;max-width:30em}
+.field{display:block;margin:0 auto 18px;max-width:420px}
+.field span{display:block;font-size:15px;color:var(--muted);margin-bottom:8px;text-align:center}
+.field input{width:100%;background:transparent;border:0;border-bottom:1px solid var(--g3);color:var(--ink);font:inherit;font-size:24px;text-align:center;padding:8px 4px}
+.field input:focus{outline:none;border-bottom-color:var(--g1)}
+.btn{display:block;margin:28px auto 0;appearance:none;border:0;cursor:pointer;background:var(--gold);color:#140e05;font-family:var(--serif);font-weight:700;font-size:17px;letter-spacing:.14em;padding:18px 34px;border-radius:2px;text-decoration:none;text-align:center;min-width:260px}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible,.opt:focus-visible,.link:focus-visible,.back:focus-visible{outline:2px solid var(--g1);outline-offset:4px}
+.link{display:block;margin:20px auto 0;background:none;border:0;color:var(--muted);font:inherit;font-size:15px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.fine{font-size:14px;color:var(--muted);text-align:center;margin-top:26px}
+
+/* queue progress */
+.queue{display:flex;align-items:center;gap:14px;margin:4px 0 44px}
+.back{background:none;border:0;color:var(--muted);font:inherit;font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
+.back[hidden]{visibility:hidden;display:block}
+.marks{flex:1;display:flex;gap:6px}
+.marks i{flex:1;height:3px;background:var(--line);border-radius:2px;transition:background .4s}
+.marks i.done{background:var(--gold)}
+.count{font-size:14px;color:var(--muted);white-space:nowrap}
+
+/* question */
+.q h2{font-weight:400;font-size:clamp(27px,6.2vw,38px);line-height:1.18;margin:0 0 14px}
+.q .hint{color:var(--muted);font-style:italic;margin:0 0 30px}
+.opts{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.opt{appearance:none;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:inherit;font-size:19px;padding:19px 44px 19px 4px;cursor:pointer;position:relative;transition:color .2s,padding .25s}
+.opt::after{content:"";position:absolute;right:10px;top:50%;width:16px;height:16px;margin-top:-8px;border:1px solid var(--g3);border-radius:50%;transition:background .2s,border-color .2s}
+.opt:hover{color:var(--g1);padding-left:12px}
+.opt.sel{color:var(--g1)}
+.opt.sel::after{background:var(--gold);border-color:var(--g1)}
+
+/* interstitial */
+.inter{text-align:center;padding-top:8vh}
+.inter .big{font-size:clamp(30px,7vw,44px);line-height:1.15;margin:0 0 24px}
+.inter p{color:var(--muted);max-width:28em;margin:0 auto}
+.seal{width:110px;margin:0 auto 34px}
+
+/* loading */
+.loading{text-align:center;padding-top:18vh}
+.loading .seal{width:150px;animation:breathe 1.6s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.05);filter:brightness(1.15)}}
+.loading p{color:var(--muted);font-style:italic}
+
+/* result */
+.res-top{text-align:center;padding-top:10px}
+.res-top .seal{width:130px;margin-bottom:26px}
+.res-top .who{color:var(--muted);margin:0 0 6px}
+.res-top h1{font-weight:400;font-size:clamp(40px,10vw,64px);line-height:1.02;margin:0 0 26px}
+.res-body p{margin:0 0 18px}
+.sec{margin-top:54px;padding-top:34px;border-top:1px solid var(--line)}
+.sec h3{font-weight:500;font-size:26px;line-height:1.2;margin:0 0 22px}
+.bars{display:grid;gap:18px;margin-bottom:26px}
+.bar .row{display:flex;justify-content:space-between;font-size:17px;margin-bottom:8px}
+.bar .row b{font-weight:500}
+.bar .track{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar .fill{height:100%;width:0;background:var(--gold);border-radius:3px;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+.bar.top .row b{color:var(--g1)}
+.scale{font-size:14px;color:var(--muted);margin:-10px 0 24px}
+.read{margin:0 0 26px;padding-left:18px;border-left:2px solid var(--g3)}
+.read .q-ref{font-size:14px;color:var(--muted);font-style:italic;margin:0 0 6px}
+.read p{margin:0}
+.pull{font-size:clamp(26px,6vw,34px);line-height:1.2;text-align:center;margin:44px 0}
+.final{text-align:center}
+.final .date{font-size:clamp(48px,12vw,72px);line-height:1;margin:18px 0 8px;letter-spacing:.04em}
+.final .q-again{font-style:italic;color:var(--muted);margin:26px 0 6px}
+.final .answer{font-size:clamp(36px,9vw,54px);margin:0 0 10px}
+
+/* envio das respostas */
+.delivery{font-size:14px;color:var(--muted);font-style:italic;text-align:center;margin:18px auto 0;max-width:30em}
+.delivery:empty{display:none}
+.delivery.warn{color:#E3B98C}
+.delivery .link{margin-top:8px;font-style:normal}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- INTRO -->
+  <section class="screen intro on" id="s-intro">
+    <img class="logo" alt="Primeiro Você" src="assets/logo-primeiro-voce.webp">
+    <h1 class="goldtext">Em que lugar da sua própria lista você está?</h1>
+    <p>São 12 perguntas rápidas e honestas. No final, você recebe o seu diagnóstico completo: o seu lugar na fila, onde a espera mais te prende e o que isso diz sobre você.</p>
+    <label class="field">
+      <span>Qual nome você quer ver no seu diagnóstico?</span>
+      <input id="name" type="text" autocomplete="given-name" maxlength="40" placeholder="Seu primeiro nome">
+    </label>
+    <button class="btn" id="start">COMEÇAR O MEU DIAGNÓSTICO</button>
+    <p class="fine">Leva cerca de 3 minutos. Não existe resposta certa, só a sua.</p>
+  </section>
+
+  <!-- QUESTION -->
+  <section class="screen q" id="s-q">
+    <div class="queue">
+      <button class="back" id="back" aria-label="Voltar à pergunta anterior">‹</button>
+      <div class="marks" id="marks" aria-hidden="true"></div>
+      <span class="count" id="count"></span>
+    </div>
+    <h2 id="q-title"></h2>
+    <p class="hint" id="q-hint"></p>
+    <div class="opts" id="opts" role="list"></div>
+  </section>
+
+  <!-- INTERSTITIAL -->
+  <section class="screen inter" id="s-inter">
+    <img class="seal" alt="" src="assets/selo.webp">
+    <p class="big goldtext" id="i-big"></p>
+    <p id="i-text"></p>
+    <button class="btn" id="i-next">CONTINUAR</button>
+  </section>
+
+  <!-- LOADING -->
+  <section class="screen loading" id="s-load">
+    <img class="seal" alt="" src="assets/selo.webp">
+    <p id="load-text">Lendo as suas respostas…</p>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-res">
+    <div class="res-top">
+      <img class="seal" alt="" src="assets/selo.webp" style="margin:0 auto 26px">
+      <p class="who" id="r-who"></p>
+      <h1 class="goldtext" id="r-title"></h1>
+    </div>
+    <div class="res-body" id="r-body"></div>
+
+    <div class="sec">
+      <h3>Onde a espera mais te prende</h3>
+      <div class="bars" id="r-bars"></div>
+      <p class="scale">Quanto maior a barra, mais você fica para depois nessa área.</p>
+      <div id="r-dim"></div>
+    </div>
+
+    <div class="sec">
+      <h3>As suas respostas, lidas de volta</h3>
+      <div id="r-read"></div>
+    </div>
+
+    <p class="pull goldtext">Esperar sobrar é o mesmo que nunca começar.</p>
+
+    <div class="sec final">
+      <h3>O seu próximo passo</h3>
+      <p id="r-next"></p>
+      <p class="date goldtext">28 . 10</p>
+      <p>às 20h</p>
+      <p class="q-again">Quem é a pessoa mais importante da sua vida?</p>
+      <p class="answer goldtext">Primeiro você.</p>
+      <a class="btn" href="#" id="wa">ENTRAR NO GRUPO DO WHATSAPP</a>
+      <button class="link" id="redo">Refazer o quiz</button>
+      <p class="delivery" id="delivery" role="status" aria-live="polite"></p>
+      <p class="fine">#PrimeiroVocê</p>
+    </div>
+  </section>
+
+</div>
+<script>
+(function(){
+"use strict";
+/* ===== CONFIGURAÇÃO DE PUBLICAÇÃO ===== */
+/* Endpoint HTTPS que recebe o POST com as respostas (n8n, CRM etc.). Vazio = não envia. */
+var WEBHOOK_URL="";
+/* Link de convite do grupo do WhatsApp. Vazio = botão fica sem destino. */
+var WHATSAPP_URL="";
+/* ====================================== */
+var QUIZ_ID="primeiro_voce_2026",PAYLOAD_VERSION="1.0";
+var PENDING_KEY=QUIZ_ID+"_pending",SEND_ATTEMPTS=3;
+
+/* Cada opção: t = texto, p = pontos de espera (0 a 3), k = chave para CRM */
+var Q=[
+ {id:"pessoa",dim:"permissao",t:"Quem é a pessoa mais importante da sua vida?",h:"Responda sem pensar muito.",o:[
+  {t:"Meus filhos",p:3,k:"filhos"},{t:"Minha mãe ou meu pai",p:3,k:"pais"},{t:"Quem divide a vida comigo",p:3,k:"parceria"},{t:"Outra pessoa da família",p:3,k:"familia"},{t:"Eu",p:0,k:"eu"}]},
+ {id:"compra",dim:"tempo",t:"Quando foi a última vez que você comprou alguma coisa só para você?",h:"Não vale comida, remédio ou a roupa que substituiu uma que rasgou.",o:[
+  {t:"Neste mês",p:0,k:"mes"},{t:"Em algum momento deste ano",p:1,k:"ano"},{t:"Não consigo lembrar",p:2,k:"nao_lembra"},{t:"Acho que nunca fiz isso",p:3,k:"nunca"}]},
+ {id:"extra",dim:"dinheiro",t:"Entrou um dinheiro que você não esperava. Para onde ele vai primeiro?",h:"",o:[
+  {t:"Para uma conta que estava esperando",p:3,k:"conta"},{t:"Para alguma necessidade da casa",p:2,k:"casa"},{t:"Guardo para uma emergência",p:1,k:"reserva"},{t:"Para alguma coisa minha",p:0,k:"eu"}]},
+ {id:"investimento",dim:"dinheiro",t:"Nos últimos 12 meses, quanto você investiu no seu desenvolvimento pessoal?",h:"Cursos, livros, terapia, mentorias, eventos.",o:[
+  {t:"Nada",p:3,k:"zero"},{t:"Até R$ 500",p:2,k:"ate500"},{t:"Entre R$ 500 e R$ 1.000",p:1,k:"500a1000"},{t:"Mais de R$ 1.000",p:0,k:"mais1000"}]},
+ {id:"area",dim:null,t:"Se uma área da sua vida pudesse mudar agora, qual seria?",h:"",o:[
+  {t:"A financeira",k:"financeira"},{t:"Os relacionamentos",k:"relacionamentos"},{t:"A saúde e o corpo",k:"saude"},{t:"A carreira e o propósito",k:"carreira"},{t:"A autoestima e as emoções",k:"autoestima"}]},
+ {id:"quando",dim:"tempo",t:"Complete a frase: eu vou cuidar de mim quando…",h:"",o:[
+  {t:"…sobrar dinheiro",p:3,k:"sobrar"},{t:"…quem depende de mim estiver bem",p:3,k:"dependentes"},{t:"…a vida der uma acalmada",p:2,k:"calma"},{t:"…eu já cuido, mesmo que seja pouco",p:0,k:"ja_cuida"}]},
+ {id:"adiando",dim:"sonhos",t:"Há quanto tempo você adia um sonho importante?",h:"",o:[
+  {t:"Menos de um ano",p:0,k:"menos1"},{t:"De um a três anos",p:1,k:"1a3"},{t:"De três a cinco anos",p:2,k:"3a5"},{t:"Mais tempo do que eu gosto de admitir",p:3,k:"muito"}]},
+ {id:"sonho",dim:null,t:"E que sonho é esse?",h:"",o:[
+  {t:"Ter a minha casa",k:"casa"},{t:"Sair das dívidas",k:"dividas"},{t:"Viajar e conhecer lugares",k:"viajar"},{t:"Ter o meu próprio negócio",k:"negocio"},{t:"Ter tranquilidade financeira",k:"tranquilidade"},{t:"Outro, só meu",k:"outro"}]},
+ {id:"sentimento",dim:"permissao",t:"Quando você gasta alguma coisa com você, o que sente?",h:"",o:[
+  {t:"Culpa, como se estivesse tirando de alguém",p:3,k:"culpa"},{t:"Quase nunca gasto comigo",p:3,k:"nunca_gasta"},{t:"Medo de que falte depois",p:2,k:"medo"},{t:"Alívio, mas dura pouco",p:1,k:"alivio"},{t:"Tranquilidade",p:0,k:"tranquilo"}]},
+ {id:"obstaculo",dim:"sonhos",t:"O que mais te impede de investir em você hoje?",h:"",o:[
+  {t:"Falta de dinheiro",p:2,k:"dinheiro"},{t:"Falta de tempo",p:2,k:"tempo"},{t:"Não sei por onde começar",p:1,k:"comeco"},{t:"Medo de não dar certo de novo",p:2,k:"medo"},{t:"No fundo, nunca foi prioridade",p:3,k:"prioridade"}]},
+ {id:"relacao",dim:null,t:"Qual é a sua história com a Elainne Ourives?",h:"",o:[
+  {t:"Estou conhecendo agora",k:"nova"},{t:"Acompanho nas redes",k:"redes"},{t:"Já fiz um curso ou evento",k:"aluno_evento"},{t:"Já faço parte do Holo",k:"holo"}]},
+ {id:"momento",dim:null,t:"Se no dia 28.10 existir um caminho para você entrar na sua própria lista, o que você sente?",h:"",o:[
+  {t:"Que é agora",k:"agora"},{t:"Vontade, com um pouco de receio",k:"receio"},{t:"Curiosidade, quero entender",k:"curioso"},{t:"Que ainda não é o meu momento",k:"nao_agora"}]}
+];
+
+var DIMS={
+ dinheiro:{n:"Dinheiro",t:"O dinheiro aparece para todo mundo, menos para você. Ele entra, e antes de chegar na sua mão já tem destino: a conta, a casa, o imprevisto. Não é falta de dinheiro. É falta de lugar para você dentro dele."},
+ tempo:{n:"Tempo",t:"Você não tem um tempo que seja só seu. Cuidar de você está sempre marcado para depois: depois que sobrar, depois que acalmar, depois que todo mundo estiver bem. E esse depois nunca chega sozinho."},
+ sonhos:{n:"Sonhos",t:"Os seus sonhos estão em pausa. Não porque você desistiu deles, mas porque sempre existe um motivo razoável para esperar mais um pouco. Cada ano de espera parece pequeno. Somados, eles viram uma vida."},
+ permissao:{n:"Permissão",t:"Você ainda não se deu permissão. Gastar com você vem com culpa, e colocar o seu nome em primeiro soa quase como egoísmo. Mas entrar na própria lista não é egoísmo. É a única forma de continuar cuidando sem se perder."}
+};
+
+var PROFILES=[
+ {min:75,title:"Fim da fila",body:[
+  "Você é a pessoa que resolve. Quando falta, é você quem dá um jeito. Quando alguém precisa, você aparece. E quando sobra alguma coisa, ela já tem destino, e esse destino quase nunca é você.",
+  "Ninguém está dizendo que isso é culpa sua. Você fez isso por amor, todos os dias, por tanto tempo que virou o seu jeito de viver.",
+  "O problema é que, nesse jeito de viver, você não cabe. E quem espera a vez no fim da fila vê a fila andar para todo mundo, menos para si."]},
+ {min:50,title:"Sempre para depois",body:[
+  "Você sabe que merece. Às vezes até começa. Mas basta aparecer uma conta, um imprevisto ou um pedido de alguém, e o que era seu volta para o fim da lista.",
+  "Isso não é fraqueza. É o hábito de quem aprendeu cedo que cuidar dos outros vem primeiro, e ninguém te ensinou a se incluir nesse cuidado.",
+  "Você não está sem movimento. Está em pausa. E pausas que duram anos cobram um preço que ninguém vê, só você."]},
+ {min:25,title:"Na porta da sua vez",body:[
+  "Você já entendeu que precisa entrar na sua própria lista, e em algumas áreas já entrou. Isso é mais raro do que parece.",
+  "Mas ainda existe uma parte da sua vida em que a espera manda. É ali que você continua dizendo: agora não, depois.",
+  "Você está na porta. O que falta não é vontade. É a decisão de atravessar."]},
+ {min:0,title:"Quase em primeiro",body:[
+  "Você já se coloca na lista, e isso diz muito sobre o caminho que percorreu até aqui. Pouca gente chega nesse ponto.",
+  "O desafio agora não é começar. É não voltar para o fim da fila quando a vida apertar, porque ela sempre aperta.",
+  "Quem já sabe o próprio valor tem uma responsabilidade a mais: sustentar essa escolha e mostrar a outras pessoas que é possível."]}
+];
+
+var DREAM={casa:"ter a sua casa",dividas:"sair das dívidas",viajar:"viajar e conhecer os lugares que você quer",negocio:"ter o seu próprio negócio",tranquilidade:"ter tranquilidade financeira",outro:"realizar o sonho que é só seu"};
+var TIME={menos1:"há menos de um ano","1a3":"há um, dois, talvez três anos","3a5":"há três, quatro, cinco anos",muito:"há mais tempo do que você gosta de admitir"};
+var WHO={filhos:"os seus filhos",pais:"a sua mãe ou o seu pai",parceria:"quem divide a vida com você",familia:"alguém da sua família"};
+var OBST={
+ dinheiro:"Você disse que o que te impede é a falta de dinheiro. Repare: faltou dinheiro para você, não para os outros. Esse é exatamente o padrão que vale olhar de frente.",
+ tempo:"Você disse que falta tempo. O tempo, assim como o dinheiro, sempre foi primeiro para os outros. O que sobra dele também nunca é seu.",
+ comeco:"Você disse que não sabe por onde começar. Faz sentido: quem passou a vida começando pelos outros nunca aprendeu por onde se começa em si.",
+ medo:"Você disse que tem medo de não dar certo de novo. Quem já tentou e não conseguiu costuma concluir que o problema é consigo. Quase nunca é.",
+ prioridade:"Você disse que, no fundo, nunca foi prioridade. Talvez essa seja a frase mais honesta deste diagnóstico, e a mais importante."
+};
+var FEEL={
+ culpa:"Quando gasta com você, sente culpa, como se estivesse tirando de alguém. Ninguém te contou que cuidar de você também é uma forma de cuidar de quem você ama.",
+ nunca_gasta:"Você quase nunca gasta com você. Não porque não queira, mas porque, na hora de decidir, você sempre perde para a necessidade de outra pessoa.",
+ medo:"Quando gasta com você, sente medo de que falte depois. É o medo de quem sustenta muita coisa e não se permite um respiro.",
+ alivio:"Quando gasta com você, sente alívio, mas ele dura pouco. É sinal de que você sabe o quanto precisa, e de que ainda não se permite de verdade.",
+ tranquilo:"Você já consegue gastar com você com tranquilidade. Guarde isso: é o que muita gente ainda está tentando aprender."
+};
+var NEXT={
+ agora:"Você disse que é agora. Então segure essa decisão até o dia 28.10.",
+ receio:"Você disse que sente vontade, com um pouco de receio. Receio é normal para quem nunca se colocou em primeiro. Venha mesmo assim.",
+ curioso:"Você disse que quer entender. É justo. No dia 28.10, tudo vai fazer sentido.",
+ nao_agora:"Você disse que ainda não é o seu momento. Talvez seja exatamente por isso que ele precise ser agora."
+};
+
+var $=function(id){return document.getElementById(id)};
+var state={i:0,a:{},name:""};
+var hadInter1=false,hadInter2=false;
+
+function show(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on")});$(id).classList.add("on");window.scrollTo(0,0)}
+
+try{var n=new URLSearchParams(location.search).get("nome");if(n)$("name").value=n.slice(0,40)}catch(e){}
+
+var marks=$("marks");Q.forEach(function(){marks.appendChild(document.createElement("i"))});
+
+function renderQ(){
+ var q=Q[state.i];
+ $("q-title").textContent=q.t;
+ $("q-hint").textContent=q.h||"";$("q-hint").style.display=q.h?"":"none";
+ $("count").textContent=(state.i+1)+" de "+Q.length;
+ $("back").hidden=state.i===0;
+ [].forEach.call(marks.children,function(m,j){m.classList.toggle("done",j<state.i)});
+ var box=$("opts");box.innerHTML="";
+ q.o.forEach(function(o,j){
+  var b=document.createElement("button");b.className="opt";b.type="button";b.setAttribute("role","listitem");b.textContent=o.t;
+  if(state.a[q.id]===j)b.classList.add("sel");
+  b.onclick=function(){pick(j,b)};box.appendChild(b);
+ });
+ show("s-q");
+}
+var locked=false;
+function pick(j,b){
+ if(locked)return;locked=true;
+ var q=Q[state.i];state.a[q.id]=j;
+ [].forEach.call($("opts").children,function(x){x.classList.remove("sel")});b.classList.add("sel");
+ setTimeout(function(){locked=false;advance()},320);
+}
+function advance(){
+ var q=Q[state.i];
+ if(q.id==="pessoa"&&!hadInter1){hadInter1=true;
+  var k=q.o[state.a.pessoa].k;
+  if(k==="eu"){inter("Pouca gente responde assim de primeira.","Vamos ver se a sua vida confirma essa resposta.")}
+  else{inter("Não vale dizer o nome de outra pessoa.","Travou, não foi? Guarde essa sensação. A gente volta nela no final.")}
+  return;
+ }
+ if(q.id==="quando"&&!hadInter2){hadInter2=true;
+  inter("Metade do caminho.","Repare numa coisa: até aqui, quantas das suas respostas foram sobre você?");return;
+ }
+ next();
+}
+function next(){ if(state.i<Q.length-1){state.i++;renderQ()}else{finish()} }
+function inter(big,text){$("i-big").textContent=big;$("i-text").textContent=text;show("s-inter");$("i-next").focus({preventScroll:true})}
+$("i-next").onclick=next;
+$("back").onclick=function(){if(state.i>0){state.i--;renderQ()}};
+$("start").onclick=function(){state.name=($("name").value||"").trim();state.i=0;renderQ()};
+$("name").addEventListener("keydown",function(e){if(e.key==="Enter")$("start").click()});
+if(WHATSAPP_URL){$("wa").href=WHATSAPP_URL;$("wa").target="_blank";$("wa").rel="noopener"}
+$("redo").onclick=function(){state={i:0,a:{},name:state.name};hadInter1=hadInter2=false;deliveryStatus("");show("s-intro")};
+
+/* ===== Envio das respostas: fila local + até 3 tentativas + reenvio automático ===== */
+function newSubmissionId(){try{return crypto.randomUUID()}catch(e){return "sub-"+Date.now()+"-"+Math.random().toString(16).slice(2,10)}}
+function readPending(){try{var v=JSON.parse(localStorage.getItem(PENDING_KEY));return Array.isArray(v)?v:[]}catch(e){return []}}
+function writePending(list){try{localStorage.setItem(PENDING_KEY,JSON.stringify(list.slice(-20)))}catch(e){/* armazenamento indisponível */}}
+function queuePending(p){var l=readPending().filter(function(x){return x.submissionId!==p.submissionId});l.push(p);writePending(l)}
+function clearPending(id){writePending(readPending().filter(function(x){return x.submissionId!==id}))}
+function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function postOnce(p){
+ return fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p),keepalive:true})
+  .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status)});
+}
+function deliver(p){
+ var attempt=0;
+ function tryOnce(){
+  return postOnce(p).then(function(){return true},function(){
+   attempt++;if(attempt>=SEND_ATTEMPTS)return false;
+   return wait(1200*Math.pow(2,attempt-1)).then(tryOnce);
+  });
+ }
+ return tryOnce();
+}
+function flushPending(){
+ if(!WEBHOOK_URL)return Promise.resolve(false);
+ var list=readPending(),ok=true;
+ return list.reduce(function(chain,p){
+  return chain.then(function(){return deliver(p).then(function(sent){if(sent)clearPending(p.submissionId);else ok=false})});
+ },Promise.resolve()).then(function(){return ok});
+}
+function deliveryStatus(st){
+ var box=$("delivery");box.className="delivery";box.textContent="";
+ if(st==="sending"){box.textContent="Registrando as suas respostas…";return}
+ if(st==="sent"){box.textContent="Respostas registradas.";return}
+ if(st!=="failed")return;
+ box.classList.add("warn");
+ var m=document.createElement("span");m.textContent="Não conseguimos registrar as suas respostas agora. Elas ficaram salvas neste navegador e serão reenviadas automaticamente.";
+ var b=document.createElement("button");b.type="button";b.className="link";b.textContent="Tentar novamente";
+ b.onclick=function(){deliveryStatus("sending");flushPending().then(function(ok){deliveryStatus(ok?"sent":"failed")})};
+ box.appendChild(m);box.appendChild(b);
+}
+function sendSubmission(p){
+ if(!WEBHOOK_URL)return;
+ queuePending(p);deliveryStatus("sending");
+ deliver(p).then(function(sent){if(sent)clearPending(p.submissionId);deliveryStatus(sent?"sent":"failed")});
+}
+function retryPendingInBackground(){
+ if(!WEBHOOK_URL||!readPending().length)return;
+ flushPending().then(function(ok){if($("s-res").classList.contains("on")&&$("delivery").textContent)deliveryStatus(ok?"sent":"failed")});
+}
+function urlParams(){var o={};try{new URLSearchParams(location.search).forEach(function(v,k){o[k]=v})}catch(e){}return o}
+window.addEventListener("online",retryPendingInBackground);
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")retryPendingInBackground()});
+retryPendingInBackground();
+
+function key(id){var q=Q.find(function(x){return x.id===id});return q.o[state.a[id]].k}
+
+function finish(){
+ show("s-load");
+ var msgs=["Lendo as suas respostas…","Encontrando o seu lugar na fila…","Montando o seu diagnóstico…"],m=0;
+ var iv=setInterval(function(){m++;if(m<msgs.length)$("load-text").textContent=msgs[m]},900);
+ setTimeout(function(){clearInterval(iv);result()},2800);
+}
+
+function result(){
+ var sums={},max={};
+ Q.forEach(function(q){if(!q.dim)return;var o=q.o[state.a[q.id]];sums[q.dim]=(sums[q.dim]||0)+o.p;max[q.dim]=(max[q.dim]||0)+3});
+ var pct={},total=0,cnt=0;
+ Object.keys(DIMS).forEach(function(d){pct[d]=Math.round(100*sums[d]/max[d]);total+=pct[d];cnt++});
+ var overall=Math.round(total/cnt);
+ var prof=PROFILES.find(function(p){return overall>=p.min});
+ var name=state.name;
+
+ $("r-who").textContent=(name?name+", o":"O")+" seu lugar na sua própria lista hoje é:";
+ $("r-title").textContent=prof.title;
+ var body=$("r-body");body.innerHTML="";
+ prof.body.forEach(function(t){var p=document.createElement("p");p.textContent=t;body.appendChild(p)});
+
+ var order=Object.keys(DIMS).sort(function(a,b){return pct[b]-pct[a]});
+ var bars=$("r-bars");bars.innerHTML="";
+ order.forEach(function(d,idx){
+  var el=document.createElement("div");el.className="bar"+(idx===0?" top":"");
+  el.innerHTML='<div class="row"><b></b><span></span></div><div class="track"><div class="fill"></div></div>';
+  el.querySelector("b").textContent=DIMS[d].n;el.querySelector("span").textContent=pct[d]+"%";
+  bars.appendChild(el);
+  setTimeout(function(){el.querySelector(".fill").style.width=Math.max(pct[d],3)+"%"},200+idx*150);
+ });
+ var top=order[0];
+ $("r-dim").innerHTML="";
+ var h=document.createElement("p");h.innerHTML="<b></b>";h.querySelector("b").textContent="A sua área de maior espera: "+DIMS[top].n+".";
+ var t=document.createElement("p");t.textContent=DIMS[top].t;
+ $("r-dim").appendChild(h);$("r-dim").appendChild(t);
+
+ var reads=[];
+ var pk=key("pessoa");
+ if(pk==="eu"){reads.push(["Quem é a pessoa mais importante da sua vida?","Você respondeu o próprio nome. Agora o desafio é fazer a sua vida concordar com essa resposta, no dinheiro, no tempo e nos sonhos."])}
+ else{reads.push(["Quem é a pessoa mais importante da sua vida?","Você respondeu "+WHO[pk]+". Não está errado. Mas a pergunta tinha uma regra: não vale dizer o nome de outra pessoa. Então responda de novo, agora, em silêncio"+(name?": "+name+".":", com o seu próprio nome.")])}
+ reads.push(["O sonho que você adia","Você quer "+DREAM[key("sonho")]+", e adia isso "+TIME[key("adiando")]+". Esse sonho não perdeu o valor. Ele só nunca passou na frente de ninguém."]);
+ reads.push(["O que te impede",OBST[key("obstaculo")]]);
+ reads.push(["Quando você gasta com você",FEEL[key("sentimento")]]);
+ var rd=$("r-read");rd.innerHTML="";
+ reads.forEach(function(r){var d=document.createElement("div");d.className="read";d.innerHTML='<p class="q-ref"></p><p></p>';d.children[0].textContent=r[0];d.children[1].textContent=r[1];rd.appendChild(d)});
+
+ $("r-next").textContent=NEXT[key("momento")]+" Nesse dia, às 20h, a Elainne Ourives vai fazer uma coisa que nunca fez. Chegue com este diagnóstico na memória e com a resposta da pergunta que abriu este quiz.";
+
+ /* Dados para o CRM: enviados ao WEBHOOK_URL (ver ENTREGA_TI.md e exemplo-payload.json) */
+ var payload={quiz:QUIZ_ID,version:PAYLOAD_VERSION,submissionId:newSubmissionId(),nome:name,perfil:prof.title,indice_geral:overall,indices:pct,area_maior_espera:top,respostas:{},respostas_texto:{},completedAt:new Date().toISOString(),params:urlParams()};
+ Q.forEach(function(q){var o=q.o[state.a[q.id]];payload.respostas[q.id]=o.k;payload.respostas_texto[q.id]=o.t});
+ window.__primeiroVoceResultado=payload;
+ try{console.log("PRIMEIRO VOCÊ | resultado",payload)}catch(e){}
+
+ show("s-res");
+ sendSubmission(payload);
+}
+})();
+</script>
+</body>
+</html>
