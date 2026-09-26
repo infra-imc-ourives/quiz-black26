@@ -68,6 +68,10 @@ h1,h2,h3,.big,.pull,.date,.answer{font-family:var(--title);font-weight:600;lette
 .btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
 .btn:focus-visible,.opt:focus-visible,.link:focus-visible,.back:focus-visible,.txt:focus-visible{outline:2px solid var(--g1);outline-offset:3px}
 .link{display:block;margin:16px auto 0;background:none;border:0;color:var(--muted);font:inherit;font-size:15px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.field+.field{margin-top:18px}
+.field input.bad{border-color:#E07A5F}
+.err{color:#E8957E;font-size:14px;text-align:center;margin:6px auto 0;max-width:420px;min-height:0}
+.err:empty{display:none}
 .fine{font-size:14px;color:var(--muted);text-align:center;margin-top:16px}
 
 /* progress */
@@ -156,6 +160,11 @@ h1,h2,h3,.big,.pull,.date,.answer{font-family:var(--title);font-weight:600;lette
       <span>Qual nome você quer ver no seu diagnóstico?</span>
       <input id="name" type="text" autocomplete="given-name" maxlength="40" placeholder="Seu primeiro nome">
     </label>
+    <label class="field">
+      <span>Para qual e-mail enviamos o seu diagnóstico?</span>
+      <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="seuemail@exemplo.com">
+    </label>
+    <p class="err" id="email-err" role="alert"></p>
     <button class="btn" id="start">QUERO O MEU DIAGNÓSTICO</button>
     <p class="fine">Leva cerca de 4 minutos. Não existe resposta certa, só a sua.</p>
   </section>
@@ -361,14 +370,14 @@ var TECH={
 };
 
 var $=function(id){return document.getElementById(id)};
-var state={i:0,a:{},txt:{},name:"",seen:{}};
+var state={i:0,a:{},txt:{},name:"",email:"",seen:{}};
 
 function ans(id){var q=byId(id);var j=state.a[id];return (q&&j!=null&&q.o)?q.o[j].k:null}
 function byId(id){for(var i=0;i<Q.length;i++)if(Q[i].id===id)return Q[i];return null}
 function seq(){return Q.filter(function(q){return !q.cond||q.cond()})}
 function show(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on")});$(id).classList.add("on");window.scrollTo(0,0)}
 
-try{var n=new URLSearchParams(location.search).get("nome");if(n)$("name").value=n.slice(0,40)}catch(e){}
+try{var qp=new URLSearchParams(location.search),n=qp.get("nome"),em=qp.get("email");if(n)$("name").value=n.slice(0,40);if(em)$("email").value=em.slice(0,120)}catch(e){}
 
 function renderQ(){
  var S=seq(),q=S[state.i];
@@ -435,9 +444,16 @@ function inter(big,text){$("i-big").textContent=big;$("i-text").textContent=text
 $("i-next").onclick=next;
 $("i-back").onclick=function(){var q=seq()[state.i];state.seen[q.id]=false;renderQ()};
 $("back").onclick=function(){if(state.i>0){state.i--;renderQ()}else{show("s-intro")}};
-$("start").onclick=function(){state.name=($("name").value||"").trim();state.i=0;renderQ()};
-$("name").addEventListener("keydown",function(e){if(e.key==="Enter")$("start").click()});
-$("redo").onclick=function(){state={i:0,a:{},txt:{},name:state.name,seen:{}};show("s-intro")};
+var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function emailErr(msg){$("email-err").textContent=msg;$("email").classList.toggle("bad",!!msg)}
+$("start").onclick=function(){
+ var em=($("email").value||"").trim().toLowerCase();
+ if(!EMAIL_RE.test(em)){emailErr(em?"Confira o e-mail, parece que falta alguma coisa.":"Preencha o seu e-mail para receber o diagnóstico.");$("email").focus();return}
+ emailErr("");state.email=em;state.name=($("name").value||"").trim();state.i=0;renderQ()};
+$("name").addEventListener("keydown",function(e){if(e.key==="Enter")$("email").focus()});
+$("email").addEventListener("keydown",function(e){if(e.key==="Enter")$("start").click()});
+$("email").addEventListener("input",function(){if($("email-err").textContent)emailErr("")});
+$("redo").onclick=function(){state={i:0,a:{},txt:{},name:state.name,email:state.email,seen:{}};show("s-intro")};
 
 function finish(){
  show("s-load");
@@ -449,11 +465,11 @@ function finish(){
 /* Envio das respostas para o n8n. Formato x-www-form-urlencoded (campos planos) para não
    depender de CORS: o navegador envia sem preflight e o n8n recebe cada campo em body. */
 var WEBHOOK="https://automacao-n8n-n8n.6v8bw5.easypanel.host/webhook/black26-quiz";
-var TRACK=["email","telefone","utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
+var TRACK=["telefone","utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
 function sendResult(p){
  try{
   var f=new URLSearchParams();
-  f.append("nome",p.nome);f.append("perfil",p.perfil);f.append("indice_geral",p.indice_geral);f.append("area_maior_espera",p.area_maior_espera);
+  f.append("nome",p.nome);f.append("email",p.email);f.append("perfil",p.perfil);f.append("indice_geral",p.indice_geral);f.append("area_maior_espera",p.area_maior_espera);
   Object.keys(p.indices).forEach(function(k){f.append("indice_"+k,p.indices[k])});
   Object.keys(p.respostas).forEach(function(k){f.append("resp_"+k,p.respostas[k]==null?"":p.respostas[k])});
   Object.keys(p.textos).forEach(function(k){f.append(k,p.textos[k])});
@@ -511,7 +527,7 @@ function result(){
  $("r-inv").textContent=INV[ans("investir")]||"";
 
  /* Dados para o CRM (Active Campaign): em produção, enviar este objeto */
- var payload={nome:name,perfil:prof.title,indice_geral:overall,indices:pct,area_maior_espera:top,respostas:{},textos:{}};
+ var payload={nome:name,email:state.email,perfil:prof.title,indice_geral:overall,indices:pct,area_maior_espera:top,respostas:{},textos:{}};
  seq().forEach(function(q){if(q.type!=="text")payload.respostas[q.id]=ans(q.id)});
  payload.textos={sonho_outro:state.txt.sonho||"",cursos_quais:state.txt.cursos_quais||"",pergunta_ao_vivo:state.txt.pergunta||""};
  window.__primeiroVoceResultado=payload;
