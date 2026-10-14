@@ -193,7 +193,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <label for="other-in" id="other-label"></label>
       <textarea class="txt" id="other-in" maxlength="400"></textarea>
       <button class="btn" id="other-go">CONTINUAR</button>
-      <button class="link" id="other-skip">Pular esta pergunta</button>
     </div>
   </section>
 
@@ -310,7 +309,7 @@ var Q=[
  {id:"cartao_credito",dim:null,t:"Você possui cartão de crédito?",o:[{t:"Sim",k:"sim"},{t:"Não",k:"nao"}]},
  {id:"investir",dim:null,t:"Para garantir todos os bônus desta Black, faz sentido para você investir cerca de R$ 3.000 nessa oferta?",o:[
   {t:"Sim, faz sentido para mim",k:"sim"},{t:"Sim, se eu puder parcelar",k:"sim_parcelado"},{t:"Preciso entender melhor antes",k:"entender"},{t:"Não neste momento",k:"nao",other:"O que faz este não ser o momento para você?"}]},
- {id:"pergunta",type:"text",dim:null,opt:true,t:"Que pergunta você quer que a Elainne responda ao vivo no dia 28.10?",h:"As perguntas escolhidas serão respondidas na transmissão. Esteja lá para ouvir a sua.",ph:"Escreva a sua pergunta aqui"}
+ {id:"pergunta",type:"text",dim:null,t:"Que pergunta você quer que a Elainne responda ao vivo no dia 28.10?",h:"As perguntas escolhidas serão respondidas na transmissão. Esteja lá para ouvir a sua.",ph:"Escreva a sua pergunta aqui"}
 ];
 
 var INTER={
@@ -401,13 +400,11 @@ function renderQ(){
  S.forEach(function(_,j){var m=document.createElement("i");if(j<state.i)m.className="done";marks.appendChild(m)});
  var box=$("opts");box.innerHTML="";
  var other=$("other");other.classList.remove("on");
- $("other-skip").style.display="none";
  if(q.type==="text"){
   $("other-label").textContent="";
   $("other-in").placeholder=q.ph||"";
   $("other-in").value=state.txt[q.id]||"";
   other.classList.add("on");
-  $("other-skip").style.display=q.opt?"":"none";
   syncGo(q);
   show("s-q");setTimeout(function(){$("other-in").focus({preventScroll:true})},200);
   return;
@@ -431,11 +428,10 @@ function openOther(q,o){
 }
 function syncGo(q){
  var v=$("other-in").value.trim();
- $("other-go").disabled=!q.opt&&v.length<2;
+ $("other-go").disabled=v.length<2;
 }
 $("other-in").addEventListener("input",function(){syncGo(seq()[state.i])});
 $("other-go").onclick=function(){var q=seq()[state.i];state.txt[q.id]=$("other-in").value.trim();advance()};
-$("other-skip").onclick=function(){var q=seq()[state.i];state.txt[q.id]="";advance()};
 
 var locked=false;
 function pick(j,b){
