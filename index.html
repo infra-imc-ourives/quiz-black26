@@ -79,6 +79,18 @@ h1,h2,h3,.big,.pull,.date,.answer{font-family:var(--title);font-weight:600;lette
 .btn:focus-visible,.opt:focus-visible,.link:focus-visible,.back:focus-visible,.txt:focus-visible{outline:2px solid var(--g1);outline-offset:3px}
 .link{display:block;margin:16px auto 0;background:none;border:0;color:var(--muted);font:inherit;font-size:15px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .field+.field,.err+.field{margin-top:18px}
+.kw-help{max-width:420px;margin:12px auto 0;background:rgba(233,201,121,.06);border:1px solid var(--line);border-left:3px solid var(--goldsolid);border-radius:6px;text-align:left}
+.kw-help summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;font-weight:600;font-size:15px;color:var(--ink)}
+.kw-help summary::-webkit-details-marker{display:none}
+.kw-help summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--goldsolid);border-bottom:2px solid var(--goldsolid);transform:rotate(45deg);margin-top:-4px;transition:transform .2s}
+.kw-help[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.kw-help summary:focus-visible{outline:2px solid var(--g1);outline-offset:3px;border-radius:4px}
+.kw-help .goldsolid{color:var(--goldsolid)}
+.kw-body{padding:0 16px 14px;font-size:15px;line-height:1.55;color:var(--soft)}
+.kw-body p{margin:0 0 10px}
+.kw-body b{color:var(--ink)}
+.kw-body .ex{margin:0;color:var(--muted)}
+.kw-body .ex b{color:var(--goldsolid)}
 .field input.bad{border-color:#E07A5F}
 .err{color:#E8957E;font-size:14px;text-align:center;margin:6px auto 0;max-width:420px;min-height:0}
 .err:empty{display:none}
@@ -184,6 +196,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <input id="kw" type="text" autocomplete="off" maxlength="60" placeholder="Cadastre sua palavra-chave">
     </label>
     <p class="err" id="kw-err" role="alert"></p>
+    <details class="kw-help">
+      <summary><span>Crie aqui a sua <span class="goldsolid">PALAVRA DE SEGURANÇA.</span></span></summary>
+      <div class="kw-body">
+        <p>Só você e a minha equipe vão conhecer. Sempre que entrarmos em contato, vamos confirmar essa palavra antes de começar o atendimento.</p>
+        <p>E se alguém falar com você se passando pela minha equipe, peça a sua palavra. <b>Quem não souber, não é da gente.</b></p>
+        <p class="ex"><b>Ex.:</b> <i>nome do seu cachorro, sua cor preferida, a sua cocriação atual. Não tenha medo de esquecer. Nós lembramos por você.</i></p>
+      </div>
+    </details>
     <button class="btn" id="start">QUERO O MEU DIAGNÓSTICO</button>
     <p class="fine">Leva cerca de 4 minutos. Não existe resposta certa, só a sua.</p>
   </section>
