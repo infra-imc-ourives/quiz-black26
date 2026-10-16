@@ -75,7 +75,7 @@ h1,h2,h3,.big,.pull,.date,.answer{font-family:var(--title);font-weight:600;lette
 .btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
 .btn:focus-visible,.opt:focus-visible,.link:focus-visible,.back:focus-visible,.txt:focus-visible{outline:2px solid var(--g1);outline-offset:3px}
 .link{display:block;margin:16px auto 0;background:none;border:0;color:var(--muted);font:inherit;font-size:15px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
-.field+.field{margin-top:18px}
+.field+.field,.err+.field{margin-top:18px}
 .field input.bad{border-color:#E07A5F}
 .err{color:#E8957E;font-size:14px;text-align:center;margin:6px auto 0;max-width:420px;min-height:0}
 .err:empty{display:none}
@@ -176,6 +176,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="seuemail@exemplo.com">
     </label>
     <p class="err" id="email-err" role="alert"></p>
+    <label class="field">
+      <span>Palavra-chave</span>
+      <input id="kw" type="text" autocomplete="off" maxlength="60" placeholder="Digite a palavra-chave">
+    </label>
+    <p class="err" id="kw-err" role="alert"></p>
     <button class="btn" id="start">QUERO O MEU DIAGNÓSTICO</button>
     <p class="fine">Leva cerca de 4 minutos. Não existe resposta certa, só a sua.</p>
   </section>
@@ -381,14 +386,14 @@ var TECH={
 };
 
 var $=function(id){return document.getElementById(id)};
-var state={i:0,a:{},txt:{},name:"",email:"",seen:{}};
+var state={i:0,a:{},txt:{},name:"",email:"",kw:"",seen:{}};
 
 function ans(id){var q=byId(id);var j=state.a[id];return (q&&j!=null&&q.o)?q.o[j].k:null}
 function byId(id){for(var i=0;i<Q.length;i++)if(Q[i].id===id)return Q[i];return null}
 function seq(){return Q.filter(function(q){return !q.cond||q.cond()})}
 function show(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on")});$(id).classList.add("on");window.scrollTo(0,0)}
 
-try{var qp=new URLSearchParams(location.search),n=qp.get("nome"),em=qp.get("email");if(n)$("name").value=n.slice(0,40);if(em)$("email").value=em.slice(0,120)}catch(e){}
+try{var qp=new URLSearchParams(location.search),n=qp.get("nome"),em=qp.get("email");if(n)$("name").value=n.slice(0,40);if(em)$("email").value=em.slice(0,120);var kw=qp.get("palavra_chave");if(kw)$("kw").value=kw.slice(0,60)}catch(e){}
 
 function renderQ(){
  var S=seq(),q=S[state.i];
@@ -457,11 +462,17 @@ function emailErr(msg){$("email-err").textContent=msg;$("email").classList.toggl
 $("start").onclick=function(){
  var em=($("email").value||"").trim().toLowerCase();
  if(!EMAIL_RE.test(em)){emailErr(em?"Confira o e-mail, parece que falta alguma coisa.":"Preencha o seu e-mail para receber o diagnóstico.");$("email").focus();return}
- emailErr("");state.email=em;state.name=($("name").value||"").trim();state.i=0;renderQ()};
+ emailErr("");
+ var kw=($("kw").value||"").trim();
+ if(kw.length<2){kwErr("Preencha a palavra-chave para continuar.");$("kw").focus();return}
+ kwErr("");state.kw=kw;state.email=em;state.name=($("name").value||"").trim();state.i=0;renderQ()};
 $("name").addEventListener("keydown",function(e){if(e.key==="Enter")$("email").focus()});
-$("email").addEventListener("keydown",function(e){if(e.key==="Enter")$("start").click()});
+$("email").addEventListener("keydown",function(e){if(e.key==="Enter")$("kw").focus()});
+function kwErr(msg){$("kw-err").textContent=msg;$("kw").classList.toggle("bad",!!msg)}
+$("kw").addEventListener("keydown",function(e){if(e.key==="Enter")$("start").click()});
+$("kw").addEventListener("input",function(){if($("kw-err").textContent)kwErr("")});
 $("email").addEventListener("input",function(){if($("email-err").textContent)emailErr("")});
-$("redo").onclick=function(){state={i:0,a:{},txt:{},name:state.name,email:state.email,seen:{}};show("s-intro")};
+$("redo").onclick=function(){state={i:0,a:{},txt:{},name:state.name,email:state.email,kw:state.kw,seen:{}};show("s-intro")};
 
 function finish(){
  show("s-load");
@@ -477,7 +488,7 @@ var TRACK=["telefone","utm_source","utm_medium","utm_campaign","utm_content","ut
 function sendResult(p){
  try{
   var f=new URLSearchParams();
-  f.append("nome",p.nome);f.append("email",p.email);f.append("perfil",p.perfil);f.append("indice_geral",p.indice_geral);f.append("area_maior_espera",p.area_maior_espera);
+  f.append("nome",p.nome);f.append("email",p.email);f.append("palavra_chave",p.palavra_chave);f.append("perfil",p.perfil);f.append("indice_geral",p.indice_geral);f.append("area_maior_espera",p.area_maior_espera);
   Object.keys(p.indices).forEach(function(k){f.append("indice_"+k,p.indices[k])});
   Object.keys(p.respostas).forEach(function(k){f.append("resp_"+k,p.respostas[k]==null?"":p.respostas[k])});
   Object.keys(p.textos).forEach(function(k){f.append(k,p.textos[k])});
@@ -535,7 +546,7 @@ function result(){
  $("r-inv").textContent=INV[ans("investir")]||"";
 
  /* Dados para o CRM (Active Campaign): em produção, enviar este objeto */
- var payload={nome:name,email:state.email,perfil:prof.title,indice_geral:overall,indices:pct,area_maior_espera:top,respostas:{},textos:{}};
+ var payload={nome:name,email:state.email,palavra_chave:state.kw,perfil:prof.title,indice_geral:overall,indices:pct,area_maior_espera:top,respostas:{},textos:{}};
  seq().forEach(function(q){if(q.type!=="text")payload.respostas[q.id]=ans(q.id)});
  payload.textos={sonho_outro:state.txt.sonho||"",cursos_quais:state.txt.cursos_quais||"",pergunta_ao_vivo:state.txt.pergunta||"",motivo_nao_investir:ans("investir")==="nao"?(state.txt.investir||""):""};
  window.__primeiroVoceResultado=payload;
